@@ -1,4 +1,4 @@
-autonews2/myapp/api_key.txt
+autonews2/api_key.txt
 *.pyc
 *~
 __pycache__
