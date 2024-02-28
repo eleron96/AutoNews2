@@ -1,0 +1,38 @@
+{% load bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Панель управления</title>
+    {% bootstrap_css %}
+    <style>
+        /* Дополнительные стили */
+        .container {
+            height: 100vh;
+        }
+        .content {
+            margin-left: 280px; /* Ширина боковой панели */
+        }
+        /* Вы можете добавить дополнительные стили для панели управления здесь */
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    {% include 'myapp/sidebar.html' %}
+
+    <!-- Основное содержимое страницы -->
+    <div class="content p-3">
+        <h1>Панель управления</h1>
+        <!-- Здесь может быть ваш контент для панели управления -->
+        <p>Это страница панели управления вашего приложения. Здесь вы можете предоставить информацию и инструменты для управления вашим приложением или сайтом.</p>
+        <!-- Добавьте элементы управления, формы, графики, таблицы и т.д. -->
+    </div>
+</div>
+
+{% bootstrap_javascript %}
+
+</body>
+</html>

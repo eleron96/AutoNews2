@@ -1,0 +1,86 @@
+{% load bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>История</title>
+    {% bootstrap_css %}
+    <style>
+        /* Дополнительные стили */
+        .container {
+            height: 100vh;
+        }
+        .content {
+            margin-left: 280px; /* Ширина боковой панели */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    {% include 'myapp/sidebar.html' %}
+
+    <!-- Основное содержимое страницы -->
+    <div class="content p-3">
+        <h1>История новостей</h1>
+
+        <!-- Таблица для отображения новостей -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Тема</th>
+                    <th>Автор</th>
+                    <th>Символов</th> <!-- Добавляем столбец со счетчиком символов -->
+                    <th>Действия</th> <!-- Добавляем столбец для действий -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for news in news_list %}
+                <tr>
+                    <td>{{ news.date }}</td>
+                    <td><a href="{% url 'news_detail' news.pk %}">{{ news.title }}</a></td>
+                    <td>{{ news.author }}</td>
+                    <td>{{ news.content|length }}</td> <!-- Выводим количество символов в поле content -->
+                    <td>
+                        <!-- Кнопка копирования -->
+                        <button onclick="copyTextToClipboard('{{ news.title|escapejs }}\n{{ news.content|escapejs }}\nRead more at the link: {% url 'news_detail' news.pk %}', this)" class="btn btn-secondary">Копировать</button>
+
+
+                        <!-- Форма удаления -->
+                        <form method="post" action="{% url 'delete_news' news.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% bootstrap_javascript %}
+
+<script>
+function copyTextToClipboard(text, button) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        const successful = document.execCommand('copy');
+        const msg = successful ? 'успешно' : 'неудачно';
+        console.log('Текст ' + msg + ' скопирован');
+        alert('Текст ' + msg + ' скопирован в буфер обмена');
+    } catch (err) {
+        console.error('Ошибка при копировании текста', err);
+    }
+    document.body.removeChild(textarea);
+}
+</script>
+
+</body>
+</html>

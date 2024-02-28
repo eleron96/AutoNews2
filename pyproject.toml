@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "autonews2"
+version = "0.1.0"
+description = ""
+authors = ["nikogamsahurdia <eleron96@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+openai = "^1.12.0"
+toml = "^0.10.2"
+django = "^5.0.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

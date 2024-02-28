@@ -1,0 +1,39 @@
+{% load static %} <!-- Загрузка статических файлов -->
+{% load bootstrap5 %} <!-- Загрузка bootstrap5, если это необходимо -->
+
+<nav class="sidebar bg-dark">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <h2>Autonews</h2>
+        <svg class="bi me-2" width="40" height="32" fill="currentColor">
+            <!-- Здесь может быть ваш SVG код для иконки или логотипа -->
+        </svg>
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a href="/" class="nav-link {% if request.path == '/' %}active{% endif %}">Главная</a>
+        </li>
+        <li>
+            <a href="{% url 'history' %}" class="nav-link text-white {% if request.path == '/history/' %}active{% endif %}">История</a>
+        </li>
+        <li>
+            <a href="{% url 'dashboard' %}" class="nav-link text-white {% if request.path == '/dashboard/' %}active{% endif %}">Панель управления</a>
+        </li>
+        <!-- Добавьте дополнительные элементы по мере необходимости -->
+    </ul>
+    <hr>
+</nav>
+
+<style>
+    .sidebar {
+        width: 280px; /* Фиксированная ширина боковой панели */
+        height: 100%;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1;
+        overflow-x: hidden;
+        padding-top: 20px;
+    }
+</style>
