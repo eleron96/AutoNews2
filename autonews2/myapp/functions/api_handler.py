@@ -4,10 +4,9 @@ from pathlib import Path
 
 from ..models import News
 
-here = Path(__file__).parent
+# Определение пути к API ключу
+api_key_path = Path(__file__).parent / 'api_key.txt'
 
-# Чтение API ключа из файла
-api_key_path = here.parent.parent / "api_key.txt"
 with open(api_key_path, "r") as file:
     api_key = file.read().strip()
 

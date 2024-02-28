@@ -1,12 +1,10 @@
-autonews2/api_key.txt
+api_key.txt
 *.pyc
-*~
 __pycache__
 db.sqlite3
 .DS_Store
 *.swp
 *.swo
-*~
 __pycache__/
 *.py[cod]
 *.log
