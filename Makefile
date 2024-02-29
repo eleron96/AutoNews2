@@ -4,7 +4,7 @@ POETRY = poetry
 
 # Запуск сервера разработки
 serve:
-	$(POETRY) run python autonews2/manage.py runserver
+	$(POETRY) run python manage.py runserver
 
 # Установка зависимостей
 install:
@@ -12,7 +12,7 @@ install:
 
 # Применение миграций
 migrate:
-	$(POETRY) run python autonews2/manage.py migrate
+	$(POETRY) run python manage.py migrate
 
 # Запуск тестов
 test:
