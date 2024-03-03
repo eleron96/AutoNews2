@@ -12,6 +12,7 @@ install:
 
 # Применение миграций
 migrate:
+	$(POETRY) run python manage.py makemigrations
 	$(POETRY) run python manage.py migrate
 
 # Запуск тестов

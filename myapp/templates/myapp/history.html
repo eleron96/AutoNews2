@@ -40,7 +40,7 @@
             <tbody>
                 {% for news in news_list %}
                 <tr>
-                    <td>{{ news.date }}</td>
+                    <td>{{ news.published_at|date:"Y-m-d" }}</td>
                     <td><a href="{% url 'news_detail' news.pk %}">{{ news.title }}</a></td>
                     <td>{{ news.author }}</td>
                     <td>{{ news.content|length }}</td> <!-- Выводим количество символов в поле content -->

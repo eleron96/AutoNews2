@@ -18,10 +18,11 @@ def summarize_text(text, author):
         response = client.chat.completions.create(model="gpt-3.5-turbo",
         messages=[{
             "role": "user",
-            "content": f"Summarize the following news text in a blog format "
-                       f"written by {author}. Please use the author's name in the text. "
-                       f"Rewrite the text in your own words as a freeform paraphrase. "
-                       f"Make the story engaging and seamless. Limit the character count to 800!:\n{text}"
+            "content": f"As a reviewer, I'm examining various blogs and authors. Today, I'm focusing on a piece written by {author}. "
+                       f"I will provide my own interpretation and summary of the original text, ensuring to maintain the essence while transforming the style. "
+                       f"My goal is to present an engaging and seamless narrative that reflects the core themes and messages of the original work, "
+                       f"all while keeping within an 800-character limit. Here's the text:\n{text}"
+
         }],
         temperature=0.5,
         max_tokens=1024)

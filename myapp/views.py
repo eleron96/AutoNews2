@@ -15,7 +15,7 @@ def home(request):
     return render(request, 'myapp/home.html')
 
 def history_view(request):
-    news_list = News.objects.all().order_by('-date')  # Получаем все новости, отсортированные по дате
+    news_list = News.objects.all().order_by('-published_at')  # Сортировка по дате и времени
     return render(request, 'myapp/history.html', {'news_list': news_list})
 
 def news_detail(request, pk):
