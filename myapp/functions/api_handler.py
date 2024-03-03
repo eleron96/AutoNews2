@@ -1,20 +1,17 @@
 from openai import OpenAI
 import re
-from pathlib import Path
+from django.conf import settings
 
 from ..models import News
 
-# Определение пути к API ключу
-api_key_path = Path(__file__).parent / 'api_key.txt'
-
-with open(api_key_path, "r") as file:
-    api_key = file.read().strip()
+# Получение API ключа из настроек Django
+api_key = settings.API_KEY
 
 client = OpenAI(api_key=api_key)
 
 def clean_text(text):
-    # Убедитесь, что ваша функция очистки текста соответствует вашим требованиям
-    return re.sub(r'\\n\\s*\\n', '\\n', text.strip())
+    # Ваша функция очистки текста
+    return re.sub(r'\n\s*\n', '\n', text.strip())
 
 def summarize_text(text, author):
     try:
