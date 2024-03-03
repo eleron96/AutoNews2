@@ -24,7 +24,7 @@ def news_detail(request, pk):
 
 
 def dashboard_view(request):
-    return render(request, 'myapp/dashboard.html')  # Указываем правильный путь к шаблону
+    return render(request, 'myapp/settings.html')  # Указываем правильный путь к шаблону
 
 def add_news_form(request):
     form = NewsForm()  # Пустая форма

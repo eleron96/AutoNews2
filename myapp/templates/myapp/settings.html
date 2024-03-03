@@ -1,0 +1,92 @@
+{% load bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Панель управления</title>
+    {% bootstrap_css %}
+    <style>
+        /* Дополнительные стили */
+        .container {
+            height: 100vh;
+        }
+        .content {
+            margin-left: 280px; /* Ширина боковой панели */
+        }
+        /* Вы можете добавить дополнительные стили для панели управления здесь */
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    {% include 'myapp/sidebar.html' %}
+
+    <!-- Основное содержимое страницы -->
+    <div class="content p-3">
+        <h1>Панель управления</h1>
+        <!-- Место для сообщения об успешном сохранении -->
+        <div id="alert-placeholder"></div>
+        <!-- Форма настроек -->
+        <form id="settings-form" onsubmit="return saveSettings()">
+            <div class="mb-3 form-check form-switch">
+                <input type="checkbox" class="form-check-input" id="engine-switch">
+                <label class="form-check-label" for="engine-switch">Включить специальный движок</label>
+            </div>
+            <div class="mb-3">
+                <label for="char-count" class="form-label">Количество символов</label>
+                <input type="number" class="form-control" id="char-count" placeholder="Введите количество символов">
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">Отмена</button>
+        </form>
+    </div>
+</div>
+
+{% bootstrap_javascript %}
+
+<script>
+// Функция для сохранения настроек
+function saveSettings() {
+    // Получаем значения из формы
+    const engineSwitch = document.getElementById('engine-switch').checked;
+    const charCount = document.getElementById('char-count').value;
+
+    // Сохраняем значения в локальное хранилище
+    localStorage.setItem('engineSwitch', engineSwitch);
+    localStorage.setItem('charCount', charCount);
+
+    // Показываем сообщение об успешном сохранении
+    const alertPlaceholder = document.getElementById('alert-placeholder');
+    alertPlaceholder.innerHTML = '<div class="alert alert-success" role="alert">Настройки успешно сохранены!</div>';
+
+    // Предотвращаем отправку формы
+    return false;
+}
+
+// Функция для загрузки сохраненных настроек
+function loadSettings() {
+    // Загружаем значения из локального хранилища
+    const engineSwitch = localStorage.getItem('engineSwitch') === 'true';
+    const charCount = localStorage.getItem('charCount');
+
+    // Устанавливаем значения в форму
+    document.getElementById('engine-switch').checked = engineSwitch;
+    document.getElementById('char-count').value = charCount || ''; // Используем пустую строку, если значение не найдено
+}
+
+// Функция для сброса формы к последним сохраненным значениям
+function resetForm() {
+    // Загружаем сохраненные настройки
+    loadSettings();
+    // Очищаем предупреждения
+    document.getElementById('alert-placeholder').innerHTML = '';
+}
+
+// Загружаем сохраненные настройки при загрузке страницы
+document.addEventListener('DOMContentLoaded', loadSettings);
+</script>
+
+</body>
+</html>
