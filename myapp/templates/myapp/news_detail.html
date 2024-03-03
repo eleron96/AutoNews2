@@ -15,7 +15,8 @@
     <p><strong>Автор:</strong> {{ news.author }}</p>
     <p><strong>Дата публикации:</strong> {{ news.date }}</p>
     <p>{{ news.content }}</p>
-    <a href="{% url 'history' %}">Вернуться к истории</a>
+    <p><strong>Ссылка на новость:</strong> <a href="{{ news.link }}" target="_blank">{{ news.link }}</a></p>
+    <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'history' %}'">Вернуться к истории</button>
 </div>
 
 {% bootstrap_javascript %}
