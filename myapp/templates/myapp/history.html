@@ -46,7 +46,7 @@
                     <td>{{ news.content|length }}</td> <!-- Выводим количество символов в поле content -->
                     <td>
                         <!-- Кнопка копирования -->
-                        <button onclick="copyTextToClipboard('{{ news.title|escapejs }}\n{{ news.content|escapejs }}\nRead more at the link: {{ news.link|escapejs }}', this)" class="btn btn-secondary">Копировать</button>
+                        <button onclick="copyTextToClipboard('## {{ news.title|escapejs }}\n\n{{ news.content|escapejs }}\n[Read more]({{ news.link|escapejs }})', this)" class="btn btn-secondary">Копировать</button>
 
 
                         <!-- Форма удаления -->
