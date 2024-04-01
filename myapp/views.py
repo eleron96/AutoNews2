@@ -30,24 +30,44 @@ def add_news_form(request):
     form = NewsForm()  # Пустая форма
     return render(request, 'myapp/add_news_form.html', {'form': form})
 
+# @require_POST
+# def add_news(request):
+#     form = NewsForm(request.POST)
+#     if form.is_valid():
+#         new_news = form.save(commit=False)  # Сохраняем форму без коммита в базу данных
+#         # Обработка содержимого новости
+#         original_content = new_news.content
+#         print(original_content)
+#         summarized_content = summarize_text(original_content, new_news.author)
+#         new_news.content = summarized_content  # Замена оригинального контента на суммаризированный
+#         new_news.save()  # Теперь сохраняем новость с суммаризированным контентом
+#         messages.success(request, 'Новость успешно добавлена')
+#         return redirect('history')  # Или куда вы хотите перенаправить пользователя после добавления новости
+#     else:
+#         # Если форма невалидна, вернуть пользователя обратно на страницу формы
+#         print(form.errors)
+#         messages.error(request, 'Ошибка добавления новости')
+#         return redirect('home')  # Используйте ваш URL или имя view для страницы добавления новости
+
 @require_POST
 def add_news(request):
     form = NewsForm(request.POST)
     if form.is_valid():
-        new_news = form.save(commit=False)  # Сохраняем форму без коммита в базу данных
-        # Обработка содержимого новости
+        new_news = form.save(commit=False)
+        # Получаем выбор модели из скрытого поля формы
+        engine_switch_state = request.POST.get('engine_switch_state',
+                                               'default_value')
         original_content = new_news.content
-        print(original_content)
-        summarized_content = summarize_text(original_content, new_news.author)
-        new_news.content = summarized_content  # Замена оригинального контента на суммаризированный
-        new_news.save()  # Теперь сохраняем новость с суммаризированным контентом
+        summarized_content = summarize_text(original_content, new_news.author, engine_switch_state)
+        new_news.content = summarized_content
+        new_news.save()
         messages.success(request, 'Новость успешно добавлена')
-        return redirect('history')  # Или куда вы хотите перенаправить пользователя после добавления новости
+        return redirect('history')
     else:
-        # Если форма невалидна, вернуть пользователя обратно на страницу формы
-        print(form.errors)
         messages.error(request, 'Ошибка добавления новости')
-        return redirect('home')  # Используйте ваш URL или имя view для страницы добавления новости
+        return redirect('home')
+
+
 
 @require_POST  # Убедитесь, что этот вид может быть вызван только через POST-запрос
 def delete_news(request, pk):

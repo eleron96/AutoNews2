@@ -31,12 +31,13 @@
         <!-- Форма настроек -->
         <form id="settings-form" onsubmit="return saveSettings()">
             <div class="mb-3 form-check form-switch">
-                <input type="checkbox" class="form-check-input" id="engine-switch">
-                <label class="form-check-label" for="engine-switch">Включить специальный движок</label>
+                <input type="checkbox" class="form-check-input" id="engine-switch" name="engine_switch" onchange="updateEngineChoice()">
+                <input type="hidden" id="engine-choice" name="engine_choice" value="">
+                <label class="form-check-label" for="engine-switch">Использовать GPT-4 (если включено, иначе используется GPT-3.5)</label>
             </div>
             <div class="mb-3">
                 <label for="char-count" class="form-label">Количество символов</label>
-                <input type="number" class="form-control" id="char-count" placeholder="Введите количество символов">
+                <input type="number" class="form-control" id="char-count" name="char_count" placeholder="Введите количество символов">
             </div>
             <button type="submit" class="btn btn-primary">Сохранить</button>
             <button type="button" class="btn btn-secondary" onclick="resetForm()">Отмена</button>
@@ -47,45 +48,58 @@
 {% bootstrap_javascript %}
 
 <script>
+// Функция для обновления выбора движка и сохранения в Session Storage
+function updateEngineChoice() {
+    const engineSwitch = document.getElementById('engine-switch').checked;
+    sessionStorage.setItem('engineSwitch', engineSwitch ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo');
+    document.getElementById('engine-choice').value = engineSwitch ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo';
+    console.log('Текущее состояние тумблера (изменено):', engineSwitch ? 'Включен' : 'Выключен'); // Логирование состояния тумблера
+}
+
 // Функция для сохранения настроек
 function saveSettings() {
-    // Получаем значения из формы
+    // Обновляем состояние тумблера в соответствии с Session Storage
+    const engineSwitchValue = sessionStorage.getItem('engineSwitch');
+    document.getElementById('engine-choice').value = engineSwitchValue;
     const engineSwitch = document.getElementById('engine-switch').checked;
     const charCount = document.getElementById('char-count').value;
 
-    // Сохраняем значения в локальное хранилище
-    localStorage.setItem('engineSwitch', engineSwitch);
-    localStorage.setItem('charCount', charCount);
+    // Логируем текущие значения перед сохранением
+    console.log('Текущее состояние тумблера (из Session Storage):', engineSwitchValue);
+    console.log('Текущее состояние тумблера (из чекбокса):', engineSwitch ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo');
+    console.log('Количество символов:', charCount);
+
+    // Сохраняем значения в Session Storage
+    sessionStorage.setItem('engineSwitch', engineSwitch ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo');
+    sessionStorage.setItem('charCount', charCount);
 
     // Показываем сообщение об успешном сохранении
     const alertPlaceholder = document.getElementById('alert-placeholder');
     alertPlaceholder.innerHTML = '<div class="alert alert-success" role="alert">Настройки успешно сохранены!</div>';
 
+    // Удаляем сообщение об успешном сохранении после 3 секунд
+    setTimeout(function() {
+        alertPlaceholder.innerHTML = '';
+    }, 3000);
+
     // Предотвращаем отправку формы
     return false;
 }
 
+
 // Функция для загрузки сохраненных настроек
 function loadSettings() {
-    // Загружаем значения из локального хранилища
-    const engineSwitch = localStorage.getItem('engineSwitch') === 'true';
-    const charCount = localStorage.getItem('charCount');
+    const engineSwitchValue = sessionStorage.getItem('engineSwitch');
+    const charCount = sessionStorage.getItem('charCount');
 
-    // Устанавливаем значения в форму
-    document.getElementById('engine-switch').checked = engineSwitch;
-    document.getElementById('char-count').value = charCount || ''; // Используем пустую строку, если значение не найдено
-}
-
-// Функция для сброса формы к последним сохраненным значениям
-function resetForm() {
-    // Загружаем сохраненные настройки
-    loadSettings();
-    // Очищаем предупреждения
-    document.getElementById('alert-placeholder').innerHTML = '';
+    document.getElementById('engine-switch').checked = (engineSwitchValue === 'gpt-4-turbo-preview');
+    document.getElementById('char-count').value = charCount || '';
+    document.getElementById('engine-choice').value = engineSwitchValue || 'gpt-3.5-turbo';
 }
 
 // Загружаем сохраненные настройки при загрузке страницы
 document.addEventListener('DOMContentLoaded', loadSettings);
+
 </script>
 
 </body>

@@ -13,9 +13,9 @@ def clean_text(text):
     # Ваша функция очистки текста
     return re.sub(r'\n\s*\n', '\n', text.strip())
 
-def summarize_text(text, author):
+def summarize_text(text, author, model_choice):
     try:
-        response = client.chat.completions.create(model="gpt-3.5-turbo",
+        response = client.chat.completions.create(model=model_choice,  # Используем выбранную модель,
         messages=[{
             "role": "user",
             "content": f"As a reviewer, I'm examining various blogs and authors. Today, I'm focusing on a piece written by {author}. "
@@ -32,11 +32,3 @@ def summarize_text(text, author):
     except Exception as e:
         return str(e)
 
-# Пример использования функции в вашем приложении
-def create_or_update_news(title, content, author):
-    summary = summarize_text(content, author)  # Получаем резюме новости
-    news, created = News.objects.update_or_create(
-        title=title,
-        defaults={'content': content, 'author': author, 'summary': summary},
-    )
-    return news
