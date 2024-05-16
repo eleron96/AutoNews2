@@ -36,8 +36,16 @@
                 <label class="form-check-label" for="engine-switch">Использовать GPT-4 (если включено, иначе используется GPT-3.5)</label>
             </div>
             <div class="mb-3">
+                <label for="engine-select" class="form-label">Выбор модели</label>
+                <select class="form-control" id="engine-select" name="engine_select">
+                    <option value="gpt-3.5-turbo">GPT-3.5</option>
+                    <option value="gpt-4-turbo-preview">GPT-4</option>
+                    <option value="gpt-4o">GPT-4o</option>
+                </select>
+            </div>
+            <div class="mb-3">
                 <label for="char-count" class="form-label">Количество символов</label>
-                <input type="number" class="form-control" id="char-count" name="char_count" placeholder="Введите количество символов">
+                <input type="number" class="form-control" id="char-count" name="char_count" placeholder="Введите количество символов" value="800">
             </div>
             <button type="submit" class="btn btn-primary">Сохранить</button>
             <button type="button" class="btn btn-secondary" onclick="resetForm()">Отмена</button>
@@ -62,15 +70,18 @@ function saveSettings() {
     const engineSwitchValue = sessionStorage.getItem('engineSwitch');
     document.getElementById('engine-choice').value = engineSwitchValue;
     const engineSwitch = document.getElementById('engine-switch').checked;
+    const engineSelect = document.getElementById('engine-select').value;
     const charCount = document.getElementById('char-count').value;
 
     // Логируем текущие значения перед сохранением
     console.log('Текущее состояние тумблера (из Session Storage):', engineSwitchValue);
     console.log('Текущее состояние тумблера (из чекбокса):', engineSwitch ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo');
+    console.log('Выбранная модель:', engineSelect);
     console.log('Количество символов:', charCount);
 
     // Сохраняем значения в Session Storage
     sessionStorage.setItem('engineSwitch', engineSwitch ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo');
+    sessionStorage.setItem('engineSelect', engineSelect);
     sessionStorage.setItem('charCount', charCount);
 
     // Показываем сообщение об успешном сохранении
@@ -86,14 +97,15 @@ function saveSettings() {
     return false;
 }
 
-
 // Функция для загрузки сохраненных настроек
 function loadSettings() {
     const engineSwitchValue = sessionStorage.getItem('engineSwitch');
-    const charCount = sessionStorage.getItem('charCount');
+    const engineSelect = sessionStorage.getItem('engineSelect');
+    const charCount = sessionStorage.getItem('charCount') || 800;
 
     document.getElementById('engine-switch').checked = (engineSwitchValue === 'gpt-4-turbo-preview');
-    document.getElementById('char-count').value = charCount || '';
+    document.getElementById('engine-select').value = engineSelect || 'gpt-3.5-turbo';
+    document.getElementById('char-count').value = charCount;
     document.getElementById('engine-choice').value = engineSwitchValue || 'gpt-3.5-turbo';
 }
 

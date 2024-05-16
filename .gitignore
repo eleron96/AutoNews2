@@ -1,4 +1,5 @@
 api_key.txt
+docker-compose.yml
 *.pyc
 __pycache__
 db.sqlite3
@@ -18,4 +19,5 @@ venv.bak/
 # PyCharm
 .idea/
 *.iml
+
 

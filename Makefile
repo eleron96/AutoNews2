@@ -20,3 +20,9 @@ test:
 	$(POETRY) run pytest
 
 .PHONY: serve install migrate test
+
+# Сборка Docker-образа
+build-docker:
+	docker build -t autonews2:latest .
+
+.PHONY: serve install migrate test build-docker

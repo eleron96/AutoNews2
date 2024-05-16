@@ -54,11 +54,11 @@ def add_news(request):
     form = NewsForm(request.POST)
     if form.is_valid():
         new_news = form.save(commit=False)
-        # Получаем выбор модели из скрытого поля формы
-        engine_switch_state = request.POST.get('engine_switch_state',
-                                               'default_value')
+        engine_switch_state = request.POST.get('engine_switch_state', 'default_value')
+        engine_select = request.POST.get('engine_select', 'gpt-3.5-turbo')  # Получаем выбранную модель
+        char_count = int(request.POST.get('char_count', 800))  # Получаем значение количества символов
         original_content = new_news.content
-        summarized_content = summarize_text(original_content, new_news.author, engine_switch_state)
+        summarized_content = summarize_text(original_content, new_news.author, engine_select, char_count)
         new_news.content = summarized_content
         new_news.save()
         messages.success(request, 'Новость успешно добавлена')
@@ -66,6 +66,8 @@ def add_news(request):
     else:
         messages.error(request, 'Ошибка добавления новости')
         return redirect('home')
+
+
 
 
 
