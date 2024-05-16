@@ -8,33 +8,22 @@
     <title>Панель управления</title>
     {% bootstrap_css %}
     <style>
-        /* Дополнительные стили */
         .container {
             height: 100vh;
         }
         .content {
-            margin-left: 280px; /* Ширина боковой панели */
+            margin-left: 280px;
         }
-        /* Вы можете добавить дополнительные стили для панели управления здесь */
     </style>
 </head>
 <body>
 
 <div class="container-fluid">
     {% include 'myapp/sidebar.html' %}
-
-    <!-- Основное содержимое страницы -->
     <div class="content p-3">
         <h1>Панель управления</h1>
-        <!-- Место для сообщения об успешном сохранении -->
         <div id="alert-placeholder"></div>
-        <!-- Форма настроек -->
         <form id="settings-form" onsubmit="return saveSettings()">
-            <div class="mb-3 form-check form-switch">
-                <input type="checkbox" class="form-check-input" id="engine-switch" name="engine_switch" onchange="updateEngineChoice()">
-                <input type="hidden" id="engine-choice" name="engine_choice" value="">
-                <label class="form-check-label" for="engine-switch">Использовать GPT-4 (если включено, иначе используется GPT-3.5)</label>
-            </div>
             <div class="mb-3">
                 <label for="engine-select" class="form-label">Выбор модели</label>
                 <select class="form-control" id="engine-select" name="engine_select">
@@ -56,60 +45,34 @@
 {% bootstrap_javascript %}
 
 <script>
-// Функция для обновления выбора движка и сохранения в Session Storage
-function updateEngineChoice() {
-    const engineSwitch = document.getElementById('engine-switch').checked;
-    sessionStorage.setItem('engineSwitch', engineSwitch ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo');
-    document.getElementById('engine-choice').value = engineSwitch ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo';
-    console.log('Текущее состояние тумблера (изменено):', engineSwitch ? 'Включен' : 'Выключен'); // Логирование состояния тумблера
-}
-
-// Функция для сохранения настроек
 function saveSettings() {
-    // Обновляем состояние тумблера в соответствии с Session Storage
-    const engineSwitchValue = sessionStorage.getItem('engineSwitch');
-    document.getElementById('engine-choice').value = engineSwitchValue;
-    const engineSwitch = document.getElementById('engine-switch').checked;
     const engineSelect = document.getElementById('engine-select').value;
     const charCount = document.getElementById('char-count').value;
 
-    // Логируем текущие значения перед сохранением
-    console.log('Текущее состояние тумблера (из Session Storage):', engineSwitchValue);
-    console.log('Текущее состояние тумблера (из чекбокса):', engineSwitch ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo');
     console.log('Выбранная модель:', engineSelect);
     console.log('Количество символов:', charCount);
 
-    // Сохраняем значения в Session Storage
-    sessionStorage.setItem('engineSwitch', engineSwitch ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo');
     sessionStorage.setItem('engineSelect', engineSelect);
     sessionStorage.setItem('charCount', charCount);
 
-    // Показываем сообщение об успешном сохранении
     const alertPlaceholder = document.getElementById('alert-placeholder');
     alertPlaceholder.innerHTML = '<div class="alert alert-success" role="alert">Настройки успешно сохранены!</div>';
 
-    // Удаляем сообщение об успешном сохранении после 3 секунд
     setTimeout(function() {
         alertPlaceholder.innerHTML = '';
     }, 3000);
 
-    // Предотвращаем отправку формы
     return false;
 }
 
-// Функция для загрузки сохраненных настроек
 function loadSettings() {
-    const engineSwitchValue = sessionStorage.getItem('engineSwitch');
     const engineSelect = sessionStorage.getItem('engineSelect');
     const charCount = sessionStorage.getItem('charCount') || 800;
 
-    document.getElementById('engine-switch').checked = (engineSwitchValue === 'gpt-4-turbo-preview');
     document.getElementById('engine-select').value = engineSelect || 'gpt-3.5-turbo';
     document.getElementById('char-count').value = charCount;
-    document.getElementById('engine-choice').value = engineSwitchValue || 'gpt-3.5-turbo';
 }
 
-// Загружаем сохраненные настройки при загрузке страницы
 document.addEventListener('DOMContentLoaded', loadSettings);
 
 </script>

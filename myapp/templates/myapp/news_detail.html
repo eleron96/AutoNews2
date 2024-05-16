@@ -13,9 +13,14 @@
 <div class="container mt-5">
     <h1>{{ news.title }}</h1>
     <p><strong>Автор:</strong> {{ news.author }}</p>
-    <p><strong>Дата публикации:</strong> {{ news.date }}</p>
+    <p><strong>Дата публикации:</strong> {{ news.published_at }}</p>
     <p>{{ news.content }}</p>
     <p><strong>Ссылка на новость:</strong> <a href="{{ news.link }}" target="_blank">{{ news.link }}</a></p>
+    <div class="meta-data" style="float: right; color: gray;">
+        <p>Модель: {{ model_version }}</p>
+        <p>Запрошено символов: {{ char_count_requested }}</p>
+        <p>Получено символов: {{ char_count_received }}</p>
+    </div>
     <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'history' %}'">Вернуться к истории</button>
 </div>
 

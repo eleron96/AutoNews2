@@ -18,9 +18,21 @@ def history_view(request):
     news_list = News.objects.all().order_by('-published_at')  # Сортировка по дате и времени
     return render(request, 'myapp/history.html', {'news_list': news_list})
 
+
 def news_detail(request, pk):
     news = get_object_or_404(News, pk=pk)
-    return render(request, 'myapp/news_detail.html', {'news': news})
+    model_version = news.model_version if news.model_version else "Данные отсутствуют"
+    char_count_requested = news.char_count_requested if news.char_count_requested else "Данные отсутствуют"
+    char_count_received = news.char_count_received if news.char_count_received else "Данные отсутствуют"
+
+    context = {
+        'news': news,
+        'model_version': model_version,
+        'char_count_requested': char_count_requested,
+        'char_count_received': char_count_received
+    }
+
+    return render(request, 'myapp/news_detail.html', context)
 
 
 def dashboard_view(request):
@@ -54,21 +66,20 @@ def add_news(request):
     form = NewsForm(request.POST)
     if form.is_valid():
         new_news = form.save(commit=False)
-        engine_switch_state = request.POST.get('engine_switch_state', 'default_value')
-        engine_select = request.POST.get('engine_select', 'gpt-3.5-turbo')  # Получаем выбранную модель
-        char_count = int(request.POST.get('char_count', 800))  # Получаем значение количества символов
+        engine_select = request.POST.get('engine_select', 'gpt-3.5-turbo')
+        char_count = int(request.POST.get('char_count', 800))
         original_content = new_news.content
         summarized_content = summarize_text(original_content, new_news.author, engine_select, char_count)
         new_news.content = summarized_content
+        new_news.model_version = engine_select
+        new_news.char_count_requested = char_count
+        new_news.char_count_received = len(summarized_content)
         new_news.save()
         messages.success(request, 'Новость успешно добавлена')
         return redirect('history')
     else:
         messages.error(request, 'Ошибка добавления новости')
         return redirect('home')
-
-
-
 
 
 @require_POST  # Убедитесь, что этот вид может быть вызван только через POST-запрос

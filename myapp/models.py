@@ -5,9 +5,10 @@ class News(models.Model):
     link = models.URLField()
     title = models.CharField(max_length=200)
     content = models.TextField()
-    # date = models.DateField(auto_now_add=True)  # Добавьте это поле
-    published_at = models.DateTimeField(
-        auto_now_add=True)  # Замените 'date' на это поле
+    published_at = models.DateTimeField(auto_now_add=True)
+    model_version = models.CharField(max_length=50, default="Данные отсутствуют")  # Версия модели
+    char_count_requested = models.IntegerField(default=0)  # Запрошенное количество символов
+    char_count_received = models.IntegerField(default=0)  # Полученное количество символов
 
     def __str__(self):
         return self.title
