@@ -60,7 +60,8 @@ def update_settings(request):
     request.session['char_count'] = char_count
 
     messages.success(request, 'Настройки успешно обновлены')
-    return redirect('settings')
+    return redirect('settings')  # Имя должно совпадать с именем URL в urls.py
+
 
 # @require_POST
 # def add_news(request):
