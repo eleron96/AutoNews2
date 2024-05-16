@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.contrib import messages  # Импортируем messages из django.contrib
+from django.views.decorators.csrf import csrf_protect
+
 
 from .functions.api_handler import summarize_text
 from .functions.forms import NewsForm
@@ -42,6 +44,24 @@ def add_news_form(request):
     form = NewsForm()  # Пустая форма
     return render(request, 'myapp/add_news_form.html', {'form': form})
 
+
+@csrf_protect
+@require_POST
+def update_settings(request):
+    engine_select = request.POST.get('engine_select', 'gpt-3.5-turbo')
+    char_count = int(request.POST.get('char_count', 800))
+
+    print('Обновленные настройки:')
+    print('Модель:', engine_select)
+    print('Количество символов:', char_count)
+
+    # Сохраняем настройки в session
+    request.session['engine_select'] = engine_select
+    request.session['char_count'] = char_count
+
+    messages.success(request, 'Настройки успешно обновлены')
+    return redirect('settings')
+
 # @require_POST
 # def add_news(request):
 #     form = NewsForm(request.POST)
@@ -66,10 +86,15 @@ def add_news(request):
     form = NewsForm(request.POST)
     if form.is_valid():
         new_news = form.save(commit=False)
-        engine_select = request.POST.get('engine_select', 'gpt-3.5-turbo')
-        char_count = int(request.POST.get('char_count', 800))
+        engine_select = request.session.get('engine_select', 'gpt-3.5-turbo')
+        char_count = request.session.get('char_count', 800)
+
+        print('Используемая модель:', engine_select)  # Отладочное сообщение
+        print('Количество символов:', char_count)  # Отладочное сообщение
+
         original_content = new_news.content
-        summarized_content = summarize_text(original_content, new_news.author, engine_select, char_count)
+        summarized_content = summarize_text(original_content, new_news.author,
+                                            engine_select, char_count)
         new_news.content = summarized_content
         new_news.model_version = engine_select
         new_news.char_count_requested = char_count

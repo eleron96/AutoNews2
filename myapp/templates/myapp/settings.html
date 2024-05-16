@@ -1,4 +1,6 @@
 {% load bootstrap5 %}
+{% load static %}
+{% load csrf_token %}
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -23,7 +25,8 @@
     <div class="content p-3">
         <h1>Панель управления</h1>
         <div id="alert-placeholder"></div>
-        <form id="settings-form" onsubmit="return saveSettings()">
+        <form id="settings-form" method="post" action="{% url 'update_settings' %}">
+            {% csrf_token %}
             <div class="mb-3">
                 <label for="engine-select" class="form-label">Выбор модели</label>
                 <select class="form-control" id="engine-select" name="engine_select">
@@ -49,31 +52,26 @@ function saveSettings() {
     const engineSelect = document.getElementById('engine-select').value;
     const charCount = document.getElementById('char-count').value;
 
-    console.log('Выбранная модель:', engineSelect);
-    console.log('Количество символов:', charCount);
+    console.log('Сохраняемая модель:', engineSelect);
+    console.log('Сохраняемое количество символов:', charCount);
 
     sessionStorage.setItem('engineSelect', engineSelect);
     sessionStorage.setItem('charCount', charCount);
-
-    const alertPlaceholder = document.getElementById('alert-placeholder');
-    alertPlaceholder.innerHTML = '<div class="alert alert-success" role="alert">Настройки успешно сохранены!</div>';
-
-    setTimeout(function() {
-        alertPlaceholder.innerHTML = '';
-    }, 3000);
-
-    return false;
 }
 
 function loadSettings() {
     const engineSelect = sessionStorage.getItem('engineSelect');
     const charCount = sessionStorage.getItem('charCount') || 800;
 
+    console.log('Загружаемая модель:', engineSelect);
+    console.log('Загружаемое количество символов:', charCount);
+
     document.getElementById('engine-select').value = engineSelect || 'gpt-3.5-turbo';
     document.getElementById('char-count').value = charCount;
 }
 
 document.addEventListener('DOMContentLoaded', loadSettings);
+document.getElementById('settings-form').addEventListener('submit', saveSettings);
 
 </script>
 
