@@ -23,7 +23,7 @@ def summarize_text(text, author, model_choice, char_count=800):
                 "content": f"As a reviewer, I'm examining various blogs and authors. Today, I'm focusing on a piece written by {author}. Please note that the text was not written by me, I am only retelling it, so it should not be in the first person, the text was written by the {author} "
                            f"I will provide my own interpretation and summary of the original text, ensuring to maintain the essence while transforming the style. "
                            f"My goal is to present an engaging and seamless narrative that reflects the core themes and messages of the original work, "
-                           f"all while keeping within a {char_count}-character limit. Here's the text:\n{text}"
+                           f"all while keeping within a {char_count}-character limit. use only simple text formatting, indentations, and punctuation. Here's the text:\n{text}"
             }],
             temperature=0.5,
             max_tokens=1024
