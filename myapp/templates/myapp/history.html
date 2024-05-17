@@ -15,6 +15,13 @@
         .content {
             margin-left: 280px; /* Ширина боковой панели */
         }
+        .btn-group {
+            display: flex;
+            gap: 10px; /* Расстояние между кнопками */
+        }
+        .btn-group form {
+            margin: 0; /* Убираем отступы у формы */
+        }
     </style>
 </head>
 <body>
@@ -45,15 +52,15 @@
                     <td>{{ news.author }}</td>
                     <td>{{ news.content|length }}</td> <!-- Выводим количество символов в поле content -->
                     <td>
-                        <!-- Кнопка копирования -->
-                        <button onclick="copyTextToClipboard('## {{ news.title|escapejs }}\n\n{{ news.content|escapejs }}\n[Read more]({{ news.link|escapejs }})', this)" class="btn btn-secondary">Копировать</button>
-
-
-                        <!-- Форма удаления -->
-                        <form method="post" action="{% url 'delete_news' news.pk %}" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Удалить</button>
-                        </form>
+                        <div class="btn-group">
+                            <!-- Кнопка копирования -->
+                            <button onclick="copyTextToClipboard('## {{ news.title|escapejs }}\n\n{{ news.content|escapejs }}\n[Read more]({{ news.link|escapejs }})', this)" class="btn btn-secondary">Копировать</button>
+                            <!-- Форма удаления -->
+                            <form method="post" action="{% url 'delete_news' news.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Удалить</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
