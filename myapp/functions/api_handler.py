@@ -15,7 +15,8 @@ def clean_text(text):
 
 def summarize_text(text, author, model_choice, char_count=800):
     try:
-        print('Модель для summarize_text:', model_choice)  # Отладочное сообщение
+        # print('Модель для summarize_text:', model_choice)  # Отладочное сообщение
+        # print("Первая функция", text)
         response = client.chat.completions.create(
             model=model_choice,  # Используем выбранную модель
             messages=[{
@@ -32,3 +33,28 @@ def summarize_text(text, author, model_choice, char_count=800):
         return clean_text(message)
     except Exception as e:
         return str(e)
+
+
+def summarize_text_brief(text, author, model_choice, char_count=800):
+    try:
+        response = client.chat.completions.create(
+            model=model_choice,  # Используем выбранную модель
+            messages=[{
+                "role": "user",
+                "content": f"Summarize the following text written by {author} in the third person, ensuring it remains within {char_count} characters. Remove any unnecessary formatting. Here's the text:\n{text}"
+                           f"There is no need to retell the text verbatim. We need to engage the reader by highlighting what is interesting for them in this blog. Avoid using promotional language and enthusiasm."
+            }],
+            temperature=0.5,
+            max_tokens=1024
+        )
+        message = response.choices[0].message.content
+        return clean_text(message)
+    except Exception as e:
+        return str(e)
+
+# Пример вызова функции
+text = "Your text here"
+author = "Author Name"
+model_choice = "chosen-model"
+result = summarize_text_brief(text, author, model_choice, char_count=800)
+print(result)

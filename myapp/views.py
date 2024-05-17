@@ -4,7 +4,7 @@ from django.contrib import messages  # Импортируем messages из djan
 from django.views.decorators.csrf import csrf_protect
 
 
-from .functions.api_handler import summarize_text
+from .functions.api_handler import summarize_text, summarize_text_brief
 from .functions.forms import NewsForm
 
 # Create your views here.
@@ -94,8 +94,12 @@ def add_news(request):
         print('Количество символов:', char_count)  # Отладочное сообщение
 
         original_content = new_news.content
-        summarized_content = summarize_text(original_content, new_news.author,
+        summarized_content_temp = summarize_text(original_content, new_news.author,
                                             engine_select, char_count)
+        print("Первый текст", summarized_content_temp)
+        summarized_content = summarize_text_brief(summarized_content_temp, new_news.author,
+                                            engine_select, char_count)
+        print("Второй текст", summarized_content)
         new_news.content = summarized_content
         new_news.model_version = engine_select
         new_news.char_count_requested = char_count

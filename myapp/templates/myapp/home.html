@@ -54,9 +54,9 @@
                 <label for="newsContent" class="form-label">Новость</label>
                 <textarea class="form-control" id="newsContent" name="content" rows="5" placeholder="Текст новости"></textarea>
             </div>
-                <!-- Скрытое поле для состояния тумблера -->
+            <!-- Скрытое поле для состояния тумблера -->
             <input type="hidden" id="engine-switch-state" name="engine_switch_state" value="">
-                <!-- Кнопка отправки -->
+            <!-- Кнопка отправки -->
             <button type="submit" class="btn btn-primary">Добавить новость</button>
         </form>
         <!-- Конец формы -->
@@ -71,11 +71,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const engineSwitchState = sessionStorage.getItem('engineSwitch') || 'gpt-3.5-turbo';
         document.getElementById('engine-switch-state').value = engineSwitchState;
     });
+
+    // Автоматическое скрытие сообщений через 2 секунды
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            alert.classList.add('fade');
+            setTimeout(() => {
+                alert.remove();
+            }, 500); // Время на завершение анимации исчезновения
+        });
+    }, 2000);
 });
 </script>
 
+<style>
+/* Анимация исчезновения */
+.alert.fade {
+    opacity: 0;
+    transition: opacity 0.5s linear;
+}
+</style>
+
 </body>
 </html>
-
-
-

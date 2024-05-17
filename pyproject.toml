@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "autonews2"
-version = "0.1.7"
+version = "0.1.12"
 description = ""
 authors = ["nikogamsahurdia <eleron96@gmail.com>"]
 readme = "README.md"
