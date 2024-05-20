@@ -1,0 +1,64 @@
+{% load static %}
+{% load bootstrap5 %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Парсинг сайта</title>
+    {% bootstrap_css %}
+    <style>
+        .container {
+            height: 100vh;
+        }
+        .content {
+            margin-left: 280px; /* Ширина боковой панели */
+        }
+        .summarized-content {
+            word-wrap: break-word; /* Перенос длинных слов */
+            white-space: pre-wrap; /* Сохраняет форматирование и переносит длинные строки */
+            max-width: 100%; /* Ограничение максимальной ширины */
+            border: 1px solid #ccc; /* Добавляем границу для визуального разделения */
+            padding: 10px; /* Добавляем отступы */
+            overflow: hidden; /* Убираем горизонтальную прокрутку */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    {% include 'myapp/sidebar.html' %}
+
+    <div class="content p-3">
+        <h1>Парсинг сайта</h1>
+
+        <!-- Форма для ввода URL и кнопка парсинга -->
+        <form method="post" action="{% url 'parsing_site' %}">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <input type="url" class="form-control" name="url" placeholder="Введите URL для парсинга" required>
+                <button class="btn btn-primary" type="submit">Парсинг</button>
+            </div>
+        </form>
+
+        <!-- Сообщение об успешном сохранении -->
+        {% if success %}
+            <div class="alert alert-success" role="alert">
+                Результат успешно сохранен в базе данных!
+            </div>
+        {% endif %}
+
+        <!-- Область для отображения обобщенного текста -->
+        {% if summarized_data %}
+            <h2>Обобщенный текст:</h2>
+            <div class="summarized-content">
+                <pre>{{ summarized_data|safe }}</pre>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% bootstrap_javascript %}
+</body>
+</html>

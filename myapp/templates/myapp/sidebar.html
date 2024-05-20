@@ -19,6 +19,9 @@
         <li>
             <a href="{% url 'dashboard' %}" class="nav-link text-white {% if request.path == '/dashboard/' %}active{% endif %}">Панель управления</a>
         </li>
+        <li>
+            <a href="{% url 'parsing_site' %}" class="nav-link text-white {% if request.path == '/parsing/' %}active{% endif %}">Парсинг сайта</a>
+        </li>
         <!-- Добавьте дополнительные элементы по мере необходимости -->
     </ul>
     <hr>

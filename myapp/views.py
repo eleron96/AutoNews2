@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.contrib import messages  # Импортируем messages из django.contrib
 from django.views.decorators.csrf import csrf_protect
+from myapp.site_parser.site_parser import parse_site
+from myapp.site_parser.text_extractor import extract_main_text
 
 
-from .functions.api_handler import summarize_text, summarize_text_brief
+from .functions.api_handler import summarize_text, summarize_text_brief, get_article_author
 from .functions.forms import NewsForm
 
 # Create your views here.
@@ -117,3 +119,45 @@ def delete_news(request, pk):
     news = get_object_or_404(News, pk=pk)
     news.delete()
     return redirect('history')  # Правильное название
+
+
+def parsing_site(request):
+    summarized_data = None
+    summarized_brief_data = None
+    if request.method == "POST":
+        url = request.POST.get("url")
+        if url:
+            title, _, parsed_data = extract_main_text(
+                url)  # Мы получаем только title и parsed_data
+            if parsed_data:
+                engine_select = request.session.get('engine_select',
+                                                    'gpt-3.5-turbo')
+
+                # Получение автора статьи
+                author = get_article_author(url, engine_select)
+
+                char_count = request.session.get('char_count', 800)
+
+                summarized_data = summarize_text(parsed_data, author,
+                                                 engine_select, char_count)
+                if summarized_data:
+                    summarized_brief_data = summarize_text_brief(
+                        summarized_data, author, engine_select, char_count)
+
+                    # Сохранение данных в модель News
+                    news_entry = News(
+                        author=author,
+                        link=url,
+                        title=title,
+                        content=summarized_brief_data,
+                        model_version=engine_select,
+                        char_count_requested=char_count,
+                        char_count_received=len(summarized_brief_data)
+                    )
+                    news_entry.save()
+                    return render(request, 'myapp/parsing.html',
+                                  {'success': True})
+
+    return render(request, 'myapp/parsing.html', {
+        'summarized_data': summarized_brief_data
+    })

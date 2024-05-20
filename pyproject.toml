@@ -12,6 +12,10 @@ toml = "^0.10.2"
 django = "^5.0.2"
 python-dotenv = "^1.0.1"
 pydantic = {version = "^1.10.8", extras = ["email"]}
+requests = "^2.31.0"
+newspaper3k = "^0.2.8"
+lxml-html-clean = "^0.1.1"
+lxml = {version = "^5.2.2", extras = ["html_clean"]}
 
 [build-system]
 requires = ["poetry-core"]

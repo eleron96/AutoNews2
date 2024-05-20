@@ -58,3 +58,21 @@ author = "Author Name"
 model_choice = "chosen-model"
 result = summarize_text_brief(text, author, model_choice, char_count=800)
 print(result)
+
+
+def get_article_author(url, model_choice):
+    try:
+        response = client.chat.completions.create(
+            model=model_choice,  # Используем выбранную модель
+            messages=[{
+                "role": "user",
+                "content": f"Who is the author of the article at this URL: {url}?"
+                           f"Answer without context. If the author is unknown, write the name of the company that owns the blog. Provide only the answer!"
+            }],
+            temperature=0.5,
+            max_tokens=1024
+        )
+        message = response.choices[0].message.content
+        return message.strip()
+    except Exception as e:
+        return str(e)

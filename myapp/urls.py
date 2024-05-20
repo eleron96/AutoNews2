@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import home, history_view, news_detail, dashboard_view, add_news, add_news_form, delete_news, update_settings
+from .views import home, history_view, news_detail, dashboard_view, add_news, add_news_form, delete_news, update_settings, parsing_site
 
 urlpatterns = [
     path('', home, name='home'),
@@ -11,5 +11,6 @@ urlpatterns = [
     path('add-news-form/', add_news_form, name='add_news_form'),
     path('news/delete/<int:pk>/', delete_news, name='delete_news'),
     path('update-settings/', update_settings, name='update_settings'),
+    path('parsing/', parsing_site, name='parsing_site'),
     # Другие пути...
 ]
