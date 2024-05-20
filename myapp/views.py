@@ -53,10 +53,6 @@ def update_settings(request):
     engine_select = request.POST.get('engine_select', 'gpt-3.5-turbo')
     char_count = int(request.POST.get('char_count', 800))
 
-    print('Обновленные настройки:')
-    print('Модель:', engine_select)
-    print('Количество символов:', char_count)
-
     # Сохраняем настройки в session
     request.session['engine_select'] = engine_select
     request.session['char_count'] = char_count
@@ -64,25 +60,6 @@ def update_settings(request):
     messages.success(request, 'Настройки успешно обновлены')
     return redirect('settings')  # Имя должно совпадать с именем URL в urls.py
 
-
-# @require_POST
-# def add_news(request):
-#     form = NewsForm(request.POST)
-#     if form.is_valid():
-#         new_news = form.save(commit=False)  # Сохраняем форму без коммита в базу данных
-#         # Обработка содержимого новости
-#         original_content = new_news.content
-#         print(original_content)
-#         summarized_content = summarize_text(original_content, new_news.author)
-#         new_news.content = summarized_content  # Замена оригинального контента на суммаризированный
-#         new_news.save()  # Теперь сохраняем новость с суммаризированным контентом
-#         messages.success(request, 'Новость успешно добавлена')
-#         return redirect('history')  # Или куда вы хотите перенаправить пользователя после добавления новости
-#     else:
-#         # Если форма невалидна, вернуть пользователя обратно на страницу формы
-#         print(form.errors)
-#         messages.error(request, 'Ошибка добавления новости')
-#         return redirect('home')  # Используйте ваш URL или имя view для страницы добавления новости
 
 @require_POST
 def add_news(request):
@@ -92,16 +69,11 @@ def add_news(request):
         engine_select = request.session.get('engine_select', 'gpt-3.5-turbo')
         char_count = request.session.get('char_count', 800)
 
-        print('Используемая модель:', engine_select)  # Отладочное сообщение
-        print('Количество символов:', char_count)  # Отладочное сообщение
-
         original_content = new_news.content
         summarized_content_temp = summarize_text(original_content, new_news.author,
                                             engine_select, char_count)
-        print("Первый текст", summarized_content_temp)
         summarized_content = summarize_text_brief(summarized_content_temp, new_news.author,
                                             engine_select, char_count)
-        print("Второй текст", summarized_content)
         new_news.content = summarized_content
         new_news.model_version = engine_select
         new_news.char_count_requested = char_count
@@ -119,14 +91,6 @@ def delete_news(request, pk):
     news = get_object_or_404(News, pk=pk)
     news.delete()
     return redirect('history')  # Правильное название
-
-
-# myapp/views.py
-from django.shortcuts import render, redirect
-from myapp.site_parser.text_extractor import extract_main_text
-from myapp.functions.api_handler import get_article_author, summarize_text, \
-    summarize_text_brief
-from myapp.models import News
 
 
 def parsing_site(request):
