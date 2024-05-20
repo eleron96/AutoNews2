@@ -104,14 +104,15 @@ def parsing_site(request):
             if News.objects.filter(link=url).exists():
                 message = "Эта новость уже есть в базе данных."
             else:
-                title, _, parsed_data = extract_main_text(
-                    url)  # Мы получаем только title и parsed_data
+                title, author, parsed_data = extract_main_text(url)
+
                 if parsed_data:
                     engine_select = request.session.get('engine_select',
                                                         'gpt-3.5-turbo')
 
-                    # Получение автора статьи
-                    author = get_article_author(url, engine_select)
+                    # Получение автора статьи, если он не был найден
+                    if not author or author == 'Автор не указан':
+                        author = get_article_author(url, engine_select)
 
                     char_count = request.session.get('char_count', 800)
 
@@ -138,3 +139,4 @@ def parsing_site(request):
         'summarized_data': summarized_brief_data,
         'message': message
     })
+
