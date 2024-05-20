@@ -42,10 +42,10 @@
             </div>
         </form>
 
-        <!-- Сообщение об успешном сохранении -->
-        {% if success %}
-            <div class="alert alert-success" role="alert">
-                Результат успешно сохранен в базе данных!
+        <!-- Сообщение об успешном сохранении или о наличии новости в базе данных -->
+        {% if message %}
+            <div class="alert alert-info" role="alert">
+                {{ message }}
             </div>
         {% endif %}
 

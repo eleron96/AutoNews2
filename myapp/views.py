@@ -121,43 +121,56 @@ def delete_news(request, pk):
     return redirect('history')  # Правильное название
 
 
+# myapp/views.py
+from django.shortcuts import render, redirect
+from myapp.site_parser.text_extractor import extract_main_text
+from myapp.functions.api_handler import get_article_author, summarize_text, \
+    summarize_text_brief
+from myapp.models import News
+
+
 def parsing_site(request):
     summarized_data = None
     summarized_brief_data = None
+    message = None
     if request.method == "POST":
         url = request.POST.get("url")
         if url:
-            title, _, parsed_data = extract_main_text(
-                url)  # Мы получаем только title и parsed_data
-            if parsed_data:
-                engine_select = request.session.get('engine_select',
-                                                    'gpt-3.5-turbo')
+            # Проверка наличия URL в базе данных
+            if News.objects.filter(link=url).exists():
+                message = "Эта новость уже есть в базе данных."
+            else:
+                title, _, parsed_data = extract_main_text(
+                    url)  # Мы получаем только title и parsed_data
+                if parsed_data:
+                    engine_select = request.session.get('engine_select',
+                                                        'gpt-3.5-turbo')
 
-                # Получение автора статьи
-                author = get_article_author(url, engine_select)
+                    # Получение автора статьи
+                    author = get_article_author(url, engine_select)
 
-                char_count = request.session.get('char_count', 800)
+                    char_count = request.session.get('char_count', 800)
 
-                summarized_data = summarize_text(parsed_data, author,
-                                                 engine_select, char_count)
-                if summarized_data:
-                    summarized_brief_data = summarize_text_brief(
-                        summarized_data, author, engine_select, char_count)
+                    summarized_data = summarize_text(parsed_data, author,
+                                                     engine_select, char_count)
+                    if summarized_data:
+                        summarized_brief_data = summarize_text_brief(
+                            summarized_data, author, engine_select, char_count)
 
-                    # Сохранение данных в модель News
-                    news_entry = News(
-                        author=author,
-                        link=url,
-                        title=title,
-                        content=summarized_brief_data,
-                        model_version=engine_select,
-                        char_count_requested=char_count,
-                        char_count_received=len(summarized_brief_data)
-                    )
-                    news_entry.save()
-                    return render(request, 'myapp/parsing.html',
-                                  {'success': True})
+                        # Сохранение данных в модель News
+                        news_entry = News(
+                            author=author,
+                            link=url,
+                            title=title,
+                            content=summarized_brief_data,
+                            model_version=engine_select,
+                            char_count_requested=char_count,
+                            char_count_received=len(summarized_brief_data)
+                        )
+                        news_entry.save()
+                        message = "Результат успешно сохранен в базе данных!"
 
     return render(request, 'myapp/parsing.html', {
-        'summarized_data': summarized_brief_data
+        'summarized_data': summarized_brief_data,
+        'message': message
     })
