@@ -205,7 +205,7 @@ def check_now(request):
             last_urls = process_rss_feed(url.address)
             logger.info(f"Найденные последние URL: {last_urls}")
             for last_url in last_urls:
-                if last_url:
+                if last_url and last_url != 'undefined':
                     logger.info(f"Отправляем URL в парсер: {last_url}")
                     try:
                         # Создаем POST-запрос к parsing_site
@@ -213,6 +213,7 @@ def check_now(request):
                         post_request = factory.post(reverse('parsing_site'), data={'url': last_url})
                         post_request.session = request.session  # устанавливаем сессию
                         response = parsing_site(post_request)
+                        logger.info(f"Ответ от parsing_site для URL: {last_url} - статус: {response.status_code}")
                         if response.status_code == 200:
                             logger.info(f"Новость сохранена для URL: {last_url}")
                         else:
@@ -220,7 +221,7 @@ def check_now(request):
                     except Exception as e:
                         logger.error(f"Ошибка при вызове parsing_site: {e}")
             if last_urls:
-                all_last_urls.extend(last_urls)
+                all_last_urls.extend([url for url in last_urls if url and url != 'undefined'])
         except Exception as e:
             logger.error(f"Ошибка при проверке URL {url.address}: {e}")
             return JsonResponse({'error': str(e)})
@@ -233,25 +234,33 @@ def check_now(request):
                 blog_posts = find_blog_posts(url.address)
                 if blog_posts:
                     # Возьмем два последних URL из найденных блогов
-                    last_urls = [post['link'] for post in blog_posts[:2]]
+                    last_urls = [post['link'] for post in blog_posts[:2] if post['link']]
+                    logger.info(f"Последние два URL из HTML парсера: {last_urls}")
                     for last_url in last_urls:
-                        logger.info(f"Отправляем URL в парсер: {last_url}")
-                        try:
-                            # Создаем POST-запрос к parsing_site
-                            factory = RequestFactory()
-                            post_request = factory.post(reverse('parsing_site'), data={'url': last_url})
-                            post_request.session = request.session  # устанавливаем сессию
-                            response = parsing_site(post_request)
-                            if response.status_code == 200:
-                                logger.info(f"Новость сохранена для URL: {last_url}")
-                            else:
-                                logger.error(f"Ошибка при вызове parsing_site: {response.status_code}")
-                        except Exception as e:
-                            logger.error(f"Ошибка при вызове parsing_site: {e}")
+                        if last_url and last_url != 'undefined':
+                            logger.info(f"Отправляем URL в парсер: {last_url}")
+                            try:
+                                # Создаем POST-запрос к parsing_site
+                                factory = RequestFactory()
+                                post_request = factory.post(reverse('parsing_site'), data={'url': last_url})
+                                post_request.session = request.session  # устанавливаем сессию
+                                response = parsing_site(post_request)
+                                logger.info(f"Ответ от parsing_site для URL: {last_url} - статус: {response.status_code}")
+                                if response.status_code == 200:
+                                    logger.info(f"Новость сохранена для URL: {last_url}")
+                                else:
+                                    logger.error(f"Ошибка при вызове parsing_site: {response.status_code}")
+                            except Exception as e:
+                                logger.error(f"Ошибка при вызове parsing_site: {e}")
                     if last_urls:
-                        all_last_urls.extend(last_urls)
+                        all_last_urls.extend([url for url in last_urls if url and url != 'undefined'])
             except Exception as e:
                 logger.error(f"Ошибка при обработке HTML страницы: {e}")
                 return JsonResponse({'error': str(e)})
 
-    return JsonResponse({'last_urls': all_last_urls if all_last_urls else []})
+    if not all_last_urls:
+        logger.info("Все обновлено, новостей не найдено")
+        return JsonResponse({'message': 'Статьи обновлены'})
+    else:
+        logger.info(f"Последние найденные URL: {all_last_urls}")
+        return JsonResponse({'last_urls': all_last_urls if all_last_urls else []})
