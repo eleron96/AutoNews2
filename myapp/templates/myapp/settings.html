@@ -23,7 +23,16 @@
     {% include 'myapp/sidebar.html' %}
     <div class="content p-3">
         <h1>Панель управления</h1>
-        <div id="alert-placeholder"></div>
+        <div id="alert-placeholder">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
         <form id="settings-form" method="post" action="{% url 'update_settings' %}">
             {% csrf_token %}
             <div class="mb-3">
@@ -41,13 +50,29 @@
             <button type="submit" class="btn btn-primary">Сохранить</button>
             <button type="button" class="btn btn-secondary" onclick="resetForm()">Отмена</button>
         </form>
-        <!-- Кнопка для перехода на страницу списка URL -->
-        <a href="{% url 'url_list' %}" class="btn btn-info mt-3">Список отслеживаемых ресурсов</a>
+
+        <div class="mt-4">
+            <a href="{% url 'url_list' %}" class="btn btn-info">Список отслеживаемых ресурсов</a>
+
+            <!-- Новый блок для настройки частоты проверки -->
+            <h2 class="mt-4">Частота проверки</h2>
+            <form id="frequency-form" method="post" action="{% url 'update_frequency' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="frequency-select" class="form-label">Выбор частоты проверки</label>
+                    <select class="form-control" id="frequency-select" name="frequency_select">
+                        <option value="every_hour">Раз в 1 час</option>
+                        <option value="every_day">Раз в день</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+                <button type="button" class="btn btn-warning" onclick="checkNow()">Проверить сейчас</button>
+            </form>
+        </div>
     </div>
 </div>
 
 {% bootstrap_javascript %}
-
 <script>
 function saveSettings() {
     const engineSelect = document.getElementById('engine-select').value;
@@ -71,9 +96,53 @@ function loadSettings() {
     document.getElementById('char-count').value = charCount;
 }
 
+function checkNow() {
+    fetch("{% url 'check_now' %}", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert("Ошибка: " + data.error);
+        } else {
+            alert(data.message + ": " + data.last_urls.join(', '));
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', loadSettings);
 document.getElementById('settings-form').addEventListener('submit', saveSettings);
 
+document.getElementById('frequency-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const frequencySelect = document.getElementById('frequency-select').value;
+    sessionStorage.setItem('frequencySelect', frequencySelect);
+
+    // Показать сообщение об успешном сохранении
+    const alertPlaceholder = document.getElementById('alert-placeholder');
+    const alertMessage = document.createElement('div');
+    alertMessage.className = 'alert alert-success alert-dismissible fade show';
+    alertMessage.textContent = 'Частота проверки успешно сохранена';
+    alertMessage.innerHTML += '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+    alertPlaceholder.appendChild(alertMessage);
+
+    setTimeout(() => {
+        alertMessage.classList.remove('show');
+    }, 1500);
+
+    setTimeout(() => {
+        alertMessage.remove();
+    }, 2000);
+
+    this.submit();
+});
 </script>
 
 </body>
