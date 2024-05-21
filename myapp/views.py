@@ -201,9 +201,7 @@ def check_now(request):
     all_last_urls = []
     for url in urls:
         try:
-            logger.info(f"Проверяем URL: {url.address}")
             last_urls = process_rss_feed(url.address)
-            logger.info(f"Найденные последние URL: {last_urls}")
             for last_url in last_urls:
                 if last_url and last_url != 'undefined':
                     logger.info(f"Отправляем URL в парсер: {last_url}")
@@ -260,7 +258,7 @@ def check_now(request):
 
     if not all_last_urls:
         logger.info("Все обновлено, новостей не найдено")
-        return JsonResponse({'message': 'Статьи обновлены'})
+        return JsonResponse({'message': 'Новости обновлены'})  # Return the message instead of last_urls
     else:
         logger.info(f"Последние найденные URL: {all_last_urls}")
         return JsonResponse({'last_urls': all_last_urls if all_last_urls else []})

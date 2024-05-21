@@ -106,16 +106,20 @@ function checkNow() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.error) {
-            alert("Ошибка: " + data.error);
+        if (data.last_urls && data.last_urls.length > 0) {
+            // Оставляем этот блок, но без alert
+            console.log("Найденные последние URL: " + data.last_urls.join(', '));
         } else {
-            alert(data.message + ": " + data.last_urls.join(', '));
+            // Оставляем этот блок, но без alert
+            console.log(data.message);  // Display the "новости обновлены" message
         }
     })
     .catch((error) => {
         console.error('Error:', error);
     });
 }
+
+
 
 document.addEventListener('DOMContentLoaded', loadSettings);
 document.getElementById('settings-form').addEventListener('submit', saveSettings);
