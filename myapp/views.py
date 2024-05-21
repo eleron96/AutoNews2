@@ -7,12 +7,12 @@ from myapp.site_parser.text_extractor import extract_main_text
 
 
 from .functions.api_handler import summarize_text, summarize_text_brief, get_article_author
-from .functions.forms import NewsForm
+from .functions.forms import NewsForm, URLForm
 
 # Create your views here.
 from django.shortcuts import render
 
-from .models import News
+from .models import News, URL
 
 
 def home(request):
@@ -139,4 +139,38 @@ def parsing_site(request):
         'summarized_data': summarized_brief_data,
         'message': message
     })
+
+
+
+def url_list(request):
+    urls = URL.objects.all()
+    return render(request, 'myapp/url_list.html', {'urls': urls})
+
+def add_url(request):
+    if request.method == 'POST':
+        form = URLForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('url_list')
+    else:
+        form = URLForm()
+    return render(request, 'myapp/add_url.html', {'form': form})
+
+def edit_url(request, pk):
+    url = get_object_or_404(URL, pk=pk)
+    if request.method == 'POST':
+        form = URLForm(request.POST, instance=url)
+        if form.is_valid():
+            form.save()
+            return redirect('url_list')
+    else:
+        form = URLForm(instance=url)
+    return render(request, 'myapp/edit_url.html', {'form': form})
+
+def delete_url(request, pk):
+    url = get_object_or_404(URL, pk=pk)
+    if request.method == 'POST':
+        url.delete()
+        return redirect('url_list')
+    return render(request, 'myapp/delete_url.html', {'url': url})
 

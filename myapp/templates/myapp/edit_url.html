@@ -1,0 +1,21 @@
+{% load bootstrap5 %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Редактировать URL</title>
+    {% bootstrap_css %}
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Редактировать URL</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+    </form>
+</div>
+{% bootstrap_javascript %}
+</body>
+</html>

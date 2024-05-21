@@ -1,0 +1,22 @@
+{% load bootstrap5 %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Удалить URL</title>
+    {% bootstrap_css %}
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Вы уверены, что хотите удалить этот URL?</h1>
+    <form method="post">
+        {% csrf_token %}
+        <p>{{ url.address }}</p>
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a href="{% url 'url_list' %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% bootstrap_javascript %}
+</body>
+</html>

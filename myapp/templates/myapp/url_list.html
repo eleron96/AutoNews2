@@ -1,0 +1,42 @@
+{% load bootstrap5 %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Список отслеживаемых ресурсов</title>
+    {% bootstrap_css %}
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Список отслеживаемых ресурсов</h1>
+    <a href="{% url 'add_url' %}" class="btn btn-primary">Добавить URL</a>
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>URL</th>
+                <th>Описание</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for url in urls %}
+            <tr>
+                <td>{{ url.address }}</td>
+                <td>{{ url.description }}</td>
+                <td>
+                    <a href="{% url 'edit_url' url.pk %}" class="btn btn-secondary">Редактировать</a>
+                    <form method="post" action="{% url 'delete_url' url.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Назад</a>
+</div>
+{% bootstrap_javascript %}
+</body>
+</html>

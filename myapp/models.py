@@ -10,5 +10,9 @@ class News(models.Model):
     char_count_requested = models.IntegerField(default=0)  # Запрошенное количество символов
     char_count_received = models.IntegerField(default=0)  # Полученное количество символов
 
+class URL(models.Model):
+    address = models.URLField(max_length=200, unique=True)
+    description = models.CharField(max_length=255, blank=True, null=True)
+
     def __str__(self):
         return self.title
