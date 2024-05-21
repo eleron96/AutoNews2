@@ -9,7 +9,6 @@ import logging
 from django.urls import reverse
 from django.test import RequestFactory
 
-
 from .functions.api_handler import summarize_text, summarize_text_brief, get_article_author
 from .functions.forms import NewsForm, URLForm
 
@@ -23,14 +22,12 @@ from myapp.site_parser.html_parser import find_blog_posts
 
 logger = logging.getLogger(__name__)
 
-
 def home(request):
     return render(request, 'myapp/home.html')
 
 def history_view(request):
     news_list = News.objects.all().order_by('-published_at')  # Сортировка по дате и времени
     return render(request, 'myapp/history.html', {'news_list': news_list})
-
 
 def news_detail(request, pk):
     news = get_object_or_404(News, pk=pk)
@@ -47,14 +44,12 @@ def news_detail(request, pk):
 
     return render(request, 'myapp/news_detail.html', context)
 
-
 def dashboard_view(request):
     return render(request, 'myapp/settings.html')  # Указываем правильный путь к шаблону
 
 def add_news_form(request):
     form = NewsForm()  # Пустая форма
     return render(request, 'myapp/add_news_form.html', {'form': form})
-
 
 @csrf_protect
 @require_POST
@@ -68,7 +63,6 @@ def update_settings(request):
 
     messages.success(request, 'Настройки успешно обновлены')
     return redirect('settings')  # Имя должно совпадать с именем URL в urls.py
-
 
 @require_POST
 def add_news(request):
@@ -94,13 +88,11 @@ def add_news(request):
         messages.error(request, 'Ошибка добавления новости')
         return redirect('home')
 
-
 @require_POST  # Убедитесь, что этот вид может быть вызван только через POST-запрос
 def delete_news(request, pk):
     news = get_object_or_404(News, pk=pk)
     news.delete()
     return redirect('history')  # Правильное название
-
 
 def parsing_site(request):
     summarized_data = None
@@ -121,7 +113,11 @@ def parsing_site(request):
 
                     # Получение автора статьи, если он не был найден
                     if not author or author == 'Автор не указан':
-                        author = get_article_author(url, engine_select)
+                        url_object = URL.objects.filter(address=url).first()
+                        if url_object and url_object.description:
+                            author = url_object.description
+                        else:
+                            author = get_article_author(url, engine_select)
 
                     char_count = request.session.get('char_count', 800)
 
@@ -148,8 +144,6 @@ def parsing_site(request):
         'summarized_data': summarized_brief_data,
         'message': message
     })
-
-
 
 def url_list(request):
     urls = URL.objects.all()
@@ -202,43 +196,37 @@ def update_frequency(request):
     messages.success(request, 'Частота проверки успешно обновлена')
     return redirect('dashboard')
 
-
 def check_now(request):
     urls = URL.objects.all()
-    last_urls = []
+    all_last_urls = []
     for url in urls:
         try:
+            logger.info(f"Проверяем URL: {url.address}")
             last_urls = process_rss_feed(url.address)
-            logger.info(
-                f"Проверяем URL: {url.address}, Найденные последние URL: {last_urls}")
+            logger.info(f"Найденные последние URL: {last_urls}")
             for last_url in last_urls:
                 if last_url:
                     logger.info(f"Отправляем URL в парсер: {last_url}")
                     try:
                         # Создаем POST-запрос к parsing_site
                         factory = RequestFactory()
-                        post_request = factory.post(reverse('parsing_site'),
-                                                    data={'url': last_url})
+                        post_request = factory.post(reverse('parsing_site'), data={'url': last_url})
                         post_request.session = request.session  # устанавливаем сессию
                         response = parsing_site(post_request)
                         if response.status_code == 200:
-                            logger.info(
-                                f"Новость сохранена для URL: {last_url}")
+                            logger.info(f"Новость сохранена для URL: {last_url}")
                         else:
-                            logger.error(
-                                f"Ошибка при вызове parsing_site: {response.status_code}")
+                            logger.error(f"Ошибка при вызове parsing_site: {response.status_code}")
                     except Exception as e:
                         logger.error(f"Ошибка при вызове parsing_site: {e}")
             if last_urls:
-                return JsonResponse(
-                    {'last_urls': last_urls, 'message': 'Проверка завершена'})
+                all_last_urls.extend(last_urls)
         except Exception as e:
             logger.error(f"Ошибка при проверке URL {url.address}: {e}")
-            return JsonResponse(
-                {'error': str(e), 'message': 'Ошибка при проверке URL'})
+            return JsonResponse({'error': str(e)})
 
     # Дополнительная проверка через HTML парсер, если новостей не найдено
-    if not last_urls:
+    if not all_last_urls:
         for url in urls:
             try:
                 logger.info(f"Проверяем HTML страницу: {url.address}")
@@ -251,26 +239,19 @@ def check_now(request):
                         try:
                             # Создаем POST-запрос к parsing_site
                             factory = RequestFactory()
-                            post_request = factory.post(reverse('parsing_site'),
-                                                        data={'url': last_url})
+                            post_request = factory.post(reverse('parsing_site'), data={'url': last_url})
                             post_request.session = request.session  # устанавливаем сессию
                             response = parsing_site(post_request)
                             if response.status_code == 200:
-                                logger.info(
-                                    f"Новость сохранена для URL: {last_url}")
+                                logger.info(f"Новость сохранена для URL: {last_url}")
                             else:
-                                logger.error(
-                                    f"Ошибка при вызове parsing_site: {response.status_code}")
+                                logger.error(f"Ошибка при вызове parsing_site: {response.status_code}")
                         except Exception as e:
                             logger.error(f"Ошибка при вызове parsing_site: {e}")
-                    return JsonResponse({'last_urls': last_urls,
-                                         'message': 'Проверка завершена с использованием HTML парсера'})
+                    if last_urls:
+                        all_last_urls.extend(last_urls)
             except Exception as e:
                 logger.error(f"Ошибка при обработке HTML страницы: {e}")
-                return JsonResponse({'error': str(e),
-                                     'message': 'Ошибка при обработке HTML страницы'})
+                return JsonResponse({'error': str(e)})
 
-    return JsonResponse({'last_urls': last_urls,
-                         'message': 'Проверка завершена, но новостей не найдено'})
-
-
+    return JsonResponse({'last_urls': all_last_urls if all_last_urls else []})
