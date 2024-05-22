@@ -17,6 +17,9 @@ newspaper3k = "^0.2.8"
 lxml-html-clean = "^0.1.1"
 lxml = {version = "^5.2.2", extras = ["html_clean"]}
 coloredlogs = "^15.0.1"
+django-background-tasks = "^1.2.5"
+celery = "^5.4.0"
+redis = "^5.0.4"
 
 [build-system]
 requires = ["poetry-core"]

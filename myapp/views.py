@@ -25,6 +25,8 @@ from functools import wraps
 from time import time
 import uuid
 
+from background_task import background
+
 # Настройка цветного логирования с изменением формата даты и времени
 coloredlogs.install(
     level='DEBUG',
@@ -313,5 +315,7 @@ def check_now(request):
     else:
         logger.info(f"[{request_id}] Последние найденные URL: {all_last_urls}", extra={'request_id': request_id})
         return JsonResponse({'last_urls': all_last_urls if all_last_urls else []})
+
+
 
 

@@ -1,0 +1,19 @@
+{% load bootstrap5 %}
+
+<form id="settings-form" method="post" action="{% url 'update_settings' %}">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="engine-select" class="form-label">Выбор модели</label>
+        <select class="form-control" id="engine-select" name="engine_select">
+            <option value="gpt-3.5-turbo">GPT-3.5</option>
+            <option value="gpt-4-turbo-preview">GPT-4</option>
+            <option value="gpt-4o">GPT-4o</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="char-count" class="form-label">Количество символов</label>
+        <input type="number" class="form-control" id="char-count" name="char_count" placeholder="Введите количество символов" value="800">
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <button type="button" class="btn btn-secondary" onclick="resetForm()">Отмена</button>
+</form>

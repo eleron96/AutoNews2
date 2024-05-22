@@ -1,0 +1,86 @@
+{% load bootstrap5 %}
+
+<div class="frequency-settings mt-4">
+    <!-- Новый блок для настройки частоты проверки -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Частота проверки</h2>
+        </div>
+        <div class="card-body">
+            <form id="frequency-form" method="post" action="{% url 'update_frequency' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="frequency-select" class="form-label">Выбор частоты проверки</label>
+                    <select class="form-control" id="frequency-select" name="frequency_select">
+                        <option value="every_hour">Раз в 1 час</option>
+                        <option value="every_day">Раз в день</option>
+                    </select>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <button type="button" class="btn btn-success flex-fill me-2" onclick="startAutoCheck()">Запустить автопроверку</button>
+                    <button type="submit" class="btn btn-primary flex-fill me-2">Сохранить</button>
+                    <button type="button" class="btn btn-warning flex-fill" onclick="checkNow()">Проверить сейчас</button>
+                </div>
+            </form>
+            <div id="last-run" class="text-muted mt-3" style="opacity: 0.7;"></div>
+        </div>
+    </div>
+    <a href="{% url 'url_list' %}" class="btn btn-info mt-3">Список отслеживаемых ресурсов</a>
+</div>
+
+<style>
+.frequency-settings .card {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.frequency-settings .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+}
+.frequency-settings .card-body {
+    padding: 20px;
+}
+.frequency-settings .btn {
+    height: 100%;
+}
+</style>
+
+<script>
+function checkNow() {
+    fetch("{% url 'check_now' %}", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.last_urls && data.last_urls.length > 0) {
+            console.log("Найденные последние URL: " + data.last_urls.join(', '));
+        } else {
+            console.log(data.message);
+        }
+        updateLastRunTime();
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
+function startAutoCheck() {
+    const frequencySelect = document.getElementById('frequency-select').value;
+    const interval = frequencySelect === 'every_hour' ? 3600000 : 86400000;
+
+    setInterval(checkNow, interval);
+}
+
+function updateLastRunTime() {
+    const now = new Date();
+    const formattedTime = now.toLocaleString();
+    document.getElementById('last-run').textContent = "Последнее автообновление: " + formattedTime;
+}
+</script>

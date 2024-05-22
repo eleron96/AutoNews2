@@ -15,6 +15,9 @@
         .content {
             margin-left: 280px;
         }
+        .form-section {
+            margin-bottom: 40px;
+        }
     </style>
 </head>
 <body>
@@ -33,41 +36,11 @@
                 {% endfor %}
             {% endif %}
         </div>
-        <form id="settings-form" method="post" action="{% url 'update_settings' %}">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="engine-select" class="form-label">Выбор модели</label>
-                <select class="form-control" id="engine-select" name="engine_select">
-                    <option value="gpt-3.5-turbo">GPT-3.5</option>
-                    <option value="gpt-4-turbo-preview">GPT-4</option>
-                    <option value="gpt-4o">GPT-4o</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="char-count" class="form-label">Количество символов</label>
-                <input type="number" class="form-control" id="char-count" name="char_count" placeholder="Введите количество символов" value="800">
-            </div>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-            <button type="button" class="btn btn-secondary" onclick="resetForm()">Отмена</button>
-        </form>
-
-        <div class="mt-4">
-            <a href="{% url 'url_list' %}" class="btn btn-info">Список отслеживаемых ресурсов</a>
-
-            <!-- Новый блок для настройки частоты проверки -->
-            <h2 class="mt-4">Частота проверки</h2>
-            <form id="frequency-form" method="post" action="{% url 'update_frequency' %}">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="frequency-select" class="form-label">Выбор частоты проверки</label>
-                    <select class="form-control" id="frequency-select" name="frequency_select">
-                        <option value="every_hour">Раз в 1 час</option>
-                        <option value="every_day">Раз в день</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Сохранить</button>
-                <button type="button" class="btn btn-warning" onclick="checkNow()">Проверить сейчас</button>
-            </form>
+        <div class="form-section">
+            {% include 'myapp/settings_form.html' %}
+        </div>
+        <div class="form-section">
+            {% include 'myapp/frequency_form.html' %}
         </div>
     </div>
 </div>
@@ -107,11 +80,9 @@ function checkNow() {
     .then(response => response.json())
     .then(data => {
         if (data.last_urls && data.last_urls.length > 0) {
-            // Оставляем этот блок, но без alert
             console.log("Найденные последние URL: " + data.last_urls.join(', '));
         } else {
-            // Оставляем этот блок, но без alert
-            console.log(data.message);  // Display the "новости обновлены" message
+            console.log(data.message);
         }
     })
     .catch((error) => {
@@ -119,7 +90,29 @@ function checkNow() {
     });
 }
 
-
+function startAutoCheck() {
+    const frequencySelect = document.getElementById('frequency-select').value;
+    setInterval(() => {
+        fetch("{% url 'check_now' %}", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.last_urls && data.last_urls.length > 0) {
+                console.log("Найденные последние URL: " + data.last_urls.join(', '));
+            } else {
+                console.log(data.message);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }, frequencySelect === 'every_hour' ? 3600000 : 86400000);
+}
 
 document.addEventListener('DOMContentLoaded', loadSettings);
 document.getElementById('settings-form').addEventListener('submit', saveSettings);
@@ -129,7 +122,6 @@ document.getElementById('frequency-form').addEventListener('submit', function(ev
     const frequencySelect = document.getElementById('frequency-select').value;
     sessionStorage.setItem('frequencySelect', frequencySelect);
 
-    // Показать сообщение об успешном сохранении
     const alertPlaceholder = document.getElementById('alert-placeholder');
     const alertMessage = document.createElement('div');
     alertMessage.className = 'alert alert-success alert-dismissible fade show';
