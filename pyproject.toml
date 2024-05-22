@@ -16,6 +16,7 @@ requests = "^2.31.0"
 newspaper3k = "^0.2.8"
 lxml-html-clean = "^0.1.1"
 lxml = {version = "^5.2.2", extras = ["html_clean"]}
+coloredlogs = "^15.0.1"
 
 [build-system]
 requires = ["poetry-core"]
