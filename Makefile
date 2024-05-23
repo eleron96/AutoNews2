@@ -6,6 +6,7 @@ POETRY = poetry
 serve:
 	$(POETRY) run python manage.py runserver
 
+
 # Установка зависимостей
 install:
 	$(POETRY) install

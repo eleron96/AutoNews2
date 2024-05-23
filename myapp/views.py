@@ -25,8 +25,6 @@ from functools import wraps
 from time import time
 import uuid
 
-from background_task import background
-
 # Настройка цветного логирования с изменением формата даты и времени
 coloredlogs.install(
     level='DEBUG',

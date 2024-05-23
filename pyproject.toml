@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "autonews2"
-version = "0.1.13"
+name = "autonews"
+version = "0.1.0"
 description = ""
 authors = ["nikogamsahurdia <eleron96@gmail.com>"]
 readme = "README.md"
@@ -17,9 +17,7 @@ newspaper3k = "^0.2.8"
 lxml-html-clean = "^0.1.1"
 lxml = {version = "^5.2.2", extras = ["html_clean"]}
 coloredlogs = "^15.0.1"
-django-background-tasks = "^1.2.5"
-celery = "^5.4.0"
-redis = "^5.0.4"
+django-bootstrap5 = "^24.2"
 
 [build-system]
 requires = ["poetry-core"]
