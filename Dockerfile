@@ -1,33 +1,33 @@
-# Базовый образ
+# Используем официальный образ Python
 FROM python:3.12-slim
 
 # Устанавливаем зависимости
 RUN apt-get update && apt-get install -y \
     build-essential \
-    libpq-dev \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean
 
-# Устанавливаем Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
+# Устанавливаем pip
+RUN pip install --upgrade pip
 
-# Устанавливаем рабочую директорию
+# Создаем и задаем рабочую директорию
 WORKDIR /app
 
-# Копируем pyproject.toml и poetry.lock
-COPY pyproject.toml poetry.lock* /app/
+# Копируем файлы проекта
+COPY pyproject.toml poetry.lock ./
 
-# Добавляем Poetry в PATH
-ENV PATH="/root/.local/bin:$PATH"
+# Устанавливаем зависимости проекта
+RUN pip install poetry
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-dev
 
-# Устанавливаем зависимости через Poetry
-RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
+# Устанавливаем зависимость django-bootstrap-v5 через pip
+RUN pip install django-bootstrap-v5
 
-# Копируем остальные файлы
-COPY . /app/
+# Копируем все остальные файлы проекта
+COPY . .
 
-# Открываем порт для сервера
+# Открываем порт
 EXPOSE 8000
 
 # Команда для запуска сервера
-CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
